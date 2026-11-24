@@ -55,6 +55,5 @@ oat10y_rate__yoy_L0,oat10y_rate,diff_yoy,0,0
 oat10y_rate__yoy_L3,oat10y_rate,diff_yoy,3,0
 y_yoy_L2,y_vol_4759_sa,log_yoy,2,2
 y_yoy_L3,y_vol_4759_sa,log_yoy,3,2
-y_yoy_L12,y_vol_4759_sa,log_yoy,12,2
 covid_closure,manual,dummy,0,0
 month_of_year,calendar,int,0,0

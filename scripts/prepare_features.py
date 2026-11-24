@@ -54,7 +54,8 @@ CFG = {
     'unemployment_rate_sa':           dict(kind='diff', pub=1, lags=[1, 3]),
     'oat10y_rate':                    dict(kind='diff', pub=0, lags=[0, 3]),
 }
-Y_AR_LAGS = [2, 3, 12]       # Y 自身滞后（ARX 用）；Y 约在 t+2 月才发布，所以从 2 开始
+Y_AR_LAGS = [2, 3]           # Y 自身滞后（ARX 用）；Y 约在 t+2 月才发布，所以从 2 开始。
+                             # 不用 12 期滞后：同比数据的 L12 会把 2020–21 年新冠的基数效应带进测试期
 
 # ---------------------------------------------------------------- 3. 平稳化变换
 def transform(s, kind):
@@ -96,7 +97,9 @@ A = data[['y_level', 'y_yoy', 'y_mom'] + non_dvf].dropna()          # 长样本�
 B = data[['y_level', 'y_yoy', 'y_mom'] + list(X.columns)].dropna()   # 短样本：含 DVF
 
 # ---------------------------------------------------------------- 6. 训练/测试切分标记（按时间，不打乱）
-A['split'] = np.where(A.index <= pd.Period('2021-12', 'M'), 'train', 'test')
+# 新冠窗口（2020-03 – 2022-06）同比数据被封控和基数效应严重扭曲，不进训练也不进测试
+_covid = (A.index >= pd.Period('2020-03', 'M')) & (A.index <= pd.Period('2022-06', 'M'))
+A['split'] = np.where(_covid, 'covid_excluded', np.where(A.index <= pd.Period('2020-02', 'M'), 'train', 'test'))
 nB = len(B); B['split'] = ['train'] * int(nB * 0.75) + ['test'] * (nB - int(nB * 0.75))
 
 for df, fn in [(A, 'model_A_long.csv'), (B, 'model_B_dvf.csv')]:

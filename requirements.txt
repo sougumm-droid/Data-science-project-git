@@ -1,2 +1,10 @@
-numpy
-pandas
+# 在 .venv 里安装：pip install -r requirements.txt
+# 版本是在 Python 3.9 上测试过的
+pandas==2.3.3
+numpy==2.0.2
+scikit-learn==1.6.1
+statsmodels==0.14.6
+scipy==1.13.1
+matplotlib==3.9.4
+openpyxl==3.1.5
+ipykernel==6.31.0

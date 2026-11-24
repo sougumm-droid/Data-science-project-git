@@ -1,0 +1,10 @@
+,coef,std_err,p_value
+const,0.0439,0.5332,0.9343
+y_yoy_L2,0.1698,0.0552,0.0021
+gt_cat_home_furnishings__yoy_L0,0.0736,0.0197,0.0002
+gt_canapé__yoy_L0,0.0696,0.0292,0.0173
+unemployment_rate_sa__yoy_L1,-2.3583,0.4415,0.0
+enq_amenagement_logement_sa__yoy_L3,0.1507,0.056,0.0071
+sitadel_logements_autorises_sa__yoy_L3,0.0334,0.0118,0.0045
+house_price_index_ancien_sa__yoy_L3,-0.0611,0.0709,0.3885
+hicp_furniture_relative__yoy_L1,0.3792,0.2078,0.068
