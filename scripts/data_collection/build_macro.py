@@ -1,6 +1,11 @@
-import sys,io,urllib.request,pandas as pd
-sys.path.insert(0,'/tmp/claude-0/scripts'); import insee
-OUT='/mnt/project-files/furniture-data/raw/'
+# 下载 INSEE / Eurostat / ECB / FRED 数据 → data/raw/（需要联网）
+import sys,os,io,urllib.request,pandas as pd
+from pathlib import Path
+ROOT = Path(__file__).resolve().parents[2]            # 仓库根目录
+RAW = ROOT / 'data' / 'raw'                            # 处理好的原始数据
+DL = RAW / 'downloads'                                 # 下载的临时文件（不提交到 GitHub）
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); import insee
+OUT=str(RAW)+'/'
 def get(u): return urllib.request.urlopen(u,timeout=180).read().decode()
 # ---- INSEE monthly series
 ins={
@@ -34,7 +39,7 @@ eu=[es('sts_trtu_m/M.VOL_SLS.G475.SCA.I21.FR?startPeriod=2000-01','eu_vol_G475_s
 rdb=es('nasq_10_nf_tr/Q.CP_MEUR.RECV.S14_S15.B6G.SCA.FR?startPeriod=2000','rdb_households_meur_q','Households+NPISH gross disposable income, current prices, SCA, M EUR per quarter')
 pop=es('demo_gind/A.JAN.FR?startPeriod=2000','population_jan1','Population on 1 January, France')
 # ---- ECB mortgage rate
-m=pd.read_csv('/tmp/claude-0/raw/mir.csv')  # downloaded earlier from data-api.ecb.europa.eu (MIR key below)
+m=pd.read_csv(DL/'mir.csv')  # 先手动下载到 data/raw/downloads/mir.csv，downloaded from data-api.ecb.europa.eu (MIR key below)
 mort=m.set_index('TIME_PERIOD').OBS_VALUE.rename('mortgage_rate_new_business'); meta.append(dict(var='mortgage_rate_new_business',source='ECB MIR',id='MIR.M.FR.B.A2C.A.R.A.2250.EUR.N',freq='M',start=mort.index[0],end=mort.index[-1],title='Bank interest rate, new loans to households for house purchase, France, %',url='https://data.ecb.europa.eu/data/datasets/MIR/MIR.M.FR.B.A2C.A.R.A.2250.EUR.N'))
 # ---- FRED 10y OAT
 f=pd.read_csv(io.StringIO(get('https://fred.stlouisfed.org/graph/fredgraph.csv?id=IRLTLT01FRM156N')))

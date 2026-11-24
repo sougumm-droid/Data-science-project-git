@@ -1,5 +1,11 @@
+# 合并所有原始数据 → data/furniture_nowcast_monthly_panel.csv 和 data/coverage.csv
+# 运行：python scripts/data_collection/merge.py（不需要联网）
 import pandas as pd,glob,os
-R='/mnt/project-files/furniture-data/raw/'; O='/mnt/project-files/furniture-data/'
+from pathlib import Path
+ROOT = Path(__file__).resolve().parents[2]            # 仓库根目录
+RAW = ROOT / 'data' / 'raw'                            # 处理好的原始数据
+DL = RAW / 'downloads'                                 # 下载的临时文件（不提交到 GitHub）
+R=str(RAW)+'/'; O=str(ROOT/'data')+'/'
 m=pd.read_csv(R+'macro_and_target_monthly_raw.csv',index_col='month')
 idx=pd.period_range('2004-01','2026-10',freq='M').astype(str)
 m=m.reindex(idx)
@@ -28,7 +34,7 @@ m['hicp_furniture_relative']=m.hicp_furniture/m.hicp_total*100
 d=pd.read_csv(R+'dvf_monthly_national.csv',index_col='month'); m=m.join(d)
 # Google Trends
 gt={}
-for f in glob.glob('/tmp/claude-0/raw/gt/*.csv'):
+for f in glob.glob(str(DL/'gt'/'*.csv')):
     n=os.path.basename(f)[:-4]; x=pd.read_csv(f,index_col=0); x.index=x.index.str[:7]; x=x.drop(columns='isPartial',errors='ignore')
     if n=='joint': 
         for c in x: gt['gtjoint_'+c.replace(' ','_')]=x[c]

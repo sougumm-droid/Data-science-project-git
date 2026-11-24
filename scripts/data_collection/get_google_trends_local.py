@@ -1,6 +1,10 @@
 # 在你自己的电脑上运行：pip install pytrends pandas && python get_google_trends_local.py
-# 输出 google_trends_monthly_FR.csv（月度，2004-01 起），放到 furniture-data/raw/ 下即可。
+# 输出 data/raw/google_trends_monthly_FR.csv（月度，2004-01 起）。
 import time, pandas as pd
+from pathlib import Path
+ROOT = Path(__file__).resolve().parents[2]            # 仓库根目录
+RAW = ROOT / 'data' / 'raw'                            # 处理好的原始数据
+DL = RAW / 'downloads'                                 # 下载的临时文件（不提交到 GitHub）
 from pytrends.request import TrendReq
 jobs = {'meuble':['meuble'],'canapé':['canapé'],'matelas':['matelas'],'déménagement':['déménagement'],'ikea':['ikea'],
         'maisons_du_monde':['maisons du monde'],'conforama':['conforama'],'crédit_immobilier':['crédit immobilier']}
@@ -15,4 +19,4 @@ time.sleep(10)
 p.build_payload([''], cat=270, geo='FR', timeframe='all')   # 类别 270 = Home Furnishings
 cols['gt_cat_home_furnishings'] = p.interest_over_time().iloc[:,0]
 df = pd.concat([pd.DataFrame(cols), j], axis=1); df.index = df.index.strftime('%Y-%m'); df.index.name = 'month'
-df.to_csv('google_trends_monthly_FR.csv'); print(df.tail())
+df.to_csv(RAW / 'google_trends_monthly_FR.csv'); print(df.tail())

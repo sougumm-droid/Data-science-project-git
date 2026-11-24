@@ -23,3 +23,6 @@ secrets*
 .DS_Store
 .idea/
 .vscode/
+
+# 采集脚本下载的临时文件（DVF 原始文件很大）
+data/raw/downloads/

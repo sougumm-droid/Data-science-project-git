@@ -1,7 +1,15 @@
+# 把 DVF 逐笔交易汇总成月度 → data/raw/dvf_monthly_*.csv
+# 先从 data.gouv.fr 下载 full_YYYY.csv.gz 放进 data/raw/downloads/dvf/
 import pandas as pd,glob,sys
+from pathlib import Path
+ROOT = Path(__file__).resolve().parents[2]            # 仓库根目录
+RAW = ROOT / 'data' / 'raw'                            # 处理好的原始数据
+DL = RAW / 'downloads'                                 # 下载的临时文件（不提交到 GitHub）
 cols=['id_mutation','date_mutation','nature_mutation','valeur_fonciere','code_departement','type_local','surface_reelle_bati']
 nat=[]; dep=[]
-for f in sorted(glob.glob('/tmp/claude-0/raw/dvf/full_*.csv.gz')):
+files=sorted(glob.glob(str(DL/'dvf'/'full_*.csv.gz')))
+if not files: sys.exit(f'没找到 DVF 原始文件：请先把 full_YYYY.csv.gz 放到 {DL/"dvf"}/')
+for f in files:
     d=pd.read_csv(f,usecols=cols,dtype={'code_departement':str,'id_mutation':str})
     d=d[d.nature_mutation.isin(['Vente',"Vente en l'état futur d'achèvement"])]
     d['is_m']=(d.type_local=='Maison').astype(int); d['is_a']=(d.type_local=='Appartement').astype(int)
@@ -28,7 +36,7 @@ out=pd.DataFrame({'dvf_n_sales':m.size(),
  'dvf_median_price_m2_appart':g[g.ok&(g.ptype=='appart')].groupby('month').pm2.median(),
  'dvf_total_value_meur':m.val.sum()/1e6})
 out.index.name='month'
-out.to_csv('/mnt/project-files/furniture-data/raw/dvf_monthly_national.csv')
+out.to_csv(RAW/'dvf_monthly_national.csv')
 dd=g.groupby(['month','dep']).agg(n_sales=('val','size')).join(g[g.ok].groupby(['month','dep']).agg(median_price_m2=('pm2','median')))
-dd.to_csv('/mnt/project-files/furniture-data/raw/dvf_monthly_by_departement.csv')
+dd.to_csv(RAW/'dvf_monthly_by_departement.csv')
 print(out.to_string())

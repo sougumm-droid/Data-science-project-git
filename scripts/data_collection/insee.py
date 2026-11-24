@@ -1,6 +1,11 @@
+# INSEE BDM 下载小工具（build_macro.py 会用到）
 import re,sys,urllib.request,os
+from pathlib import Path
+ROOT = Path(__file__).resolve().parents[2]            # 仓库根目录
+RAW = ROOT / 'data' / 'raw'                            # 处理好的原始数据
+DL = RAW / 'downloads'                                 # 下载的临时文件（不提交到 GitHub）
 def keys(df):
-    p=f'/tmp/claude-0/raw/{df}.keys.xml'
+    os.makedirs(DL,exist_ok=True); p=str(DL/f'{df}.keys.xml')
     if not os.path.exists(p):
         urllib.request.urlretrieve(f'https://bdm.insee.fr/series/sdmx/data/{df}?detail=nodata',p)
     t=open(p).read()
